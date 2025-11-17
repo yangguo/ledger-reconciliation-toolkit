@@ -1378,9 +1378,13 @@ def main():
     
     # 检查命令行参数
     target_year = None
+    single_file_path = None
     if len(sys.argv) > 1:
         arg = sys.argv[1].strip()
-        if arg in ['2022', '2023', '2024', '2025']:
+        if arg.lower().endswith('.xlsx') or os.path.exists(arg):
+            single_file_path = arg
+            print(f"🎯 通过命令行参数指定单文件分析: {os.path.basename(single_file_path)}")
+        elif arg in ['2022', '2023', '2024', '2025']:
             target_year = arg
             print(f"🎯 通过命令行参数指定分析{target_year}年数据")
         elif arg == 'all':
@@ -1388,9 +1392,43 @@ def main():
             print("🎯 通过命令行参数指定分析所有年份数据")
         else:
             print(f"❌ 无效的命令行参数: {arg}")
-            print("💡 有效参数: 2022, 2023, 2024, 2025, all")
+            print("💡 有效参数: 2022, 2023, 2024, 2025, all, 或 .xlsx 文件路径")
             print("💡 示例: python accounting_voucher_analyzer_2025.py 2025")
+            print("💡 示例: python accounting_voucher_analyzer_2025.py d:\\User Data\\yangfan15\\Desktop\\testing\\2025je1-6.xlsx")
             sys.exit(1)
+    if single_file_path and len(sys.argv) > 2:
+        arg2 = sys.argv[2].strip()
+        if arg2 in ['2022', '2023', '2024', '2025', 'all']:
+            target_year = arg2
+            print(f"🎯 通过第二参数指定分析{target_year}年数据")
+    if single_file_path:
+        if not os.path.exists(single_file_path):
+            print(f"❌ 文件不存在: {single_file_path}")
+            sys.exit(1)
+        analyzer = AccountingVoucherAnalyzer()
+        analyzer.file_path = single_file_path
+        print(f"📁 单文件模式，开始处理: {os.path.basename(single_file_path)}")
+        if not analyzer.parse_excel_data():
+            print("❌ 处理文件失败")
+            sys.exit(1)
+        data_year = analyzer.get_data_year()
+        if not data_year:
+            filename = os.path.basename(single_file_path)
+            m = re.search(r'(2022|2023|2024|2025)', filename)
+            if m:
+                data_year = m.group(1)
+        if target_year == 'all':
+            analyzer.run_analysis()
+            return
+        if target_year in ['2022', '2023', '2024', '2025']:
+            analyzer.run_analysis_internal(target_year)
+            return
+        if data_year:
+            print(f"📅 检测到数据年份: {data_year}")
+            analyzer.run_analysis_internal(data_year)
+            return
+        analyzer.run_analysis()
+        return
     
     # 自动查找当前目录下所有2022-2025年的JE文件
     current_dir = "d:\\User Data\\yangfan15\\Desktop\\testing"
