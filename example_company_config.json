@@ -1,0 +1,17 @@
+{
+    "target_patterns": ["COMPANY_PATTERN"],
+    "output_prefix": "COMPANY_NAME_对账报告",
+    "threshold": 0.01,
+    "je_columns": {
+        "book": "账簿",
+        "subject": "科目",
+        "debit": "借方本币",
+        "credit": "贷方本币"
+    },
+    "tb_columns": {
+        "book": ["核算账簿名称", "主体账簿", "账簿"],
+        "account_code": "科目编码",
+        "debit": ["本期借方.1", "本期借方发生.1"],
+        "credit": ["本期贷方.1", "本期贷方发生.1"]
+    }
+}
