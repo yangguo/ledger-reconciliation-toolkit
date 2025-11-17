@@ -10,14 +10,8 @@ This project is a comprehensive suite of financial analysis tools, including acc
 
 ### 1. 会计分录检查器 (Accounting Voucher Analyzers)
 
-#### 主要脚本 (Main Scripts)
-- **`accounting_voucher_analyzer_2025.py`** - 最新版本，支持2022-2025年数据
-- **`accounting_voucher_analyzer.py`** - 原版本
-
-#### 年度专用版本 (Year-specific Versions)
-- `accounting_voucher_analyzer_2022.py` - 2022年专用版本
-- `accounting_voucher_analyzer_2023.py` - 2023年专用版本  
-- `accounting_voucher_analyzer_2024.py` - 2024年专用版本
+#### 主要脚本 (Main Script)
+- **`accounting_voucher_analyzer_2025.py`** — 最新版本，支持2022–2025年数据
 
 #### 功能特性 (Features)
 - ✅ **多年度支持**: 支持2022-2025年会计数据分析
@@ -28,26 +22,17 @@ This project is a comprehensive suite of financial analysis tools, including acc
 - ✅ **Excel报告生成**: 自动生成详细的分析报告
 - ✅ **异常处理**: 完善的错误处理和数据验证机制
 
-### 2. 对账分析器 (Reconciliation Analyzers)
+### 2. 对账分析器 (Reconciliation Analyzer)
 
-#### 公司专用分析器 (Company-specific Analyzers)
-- **`jx_reconciliation_analyzer.py`** - ***REMOVED***
-- **`dg_reconciliation_analyzer.py`** - ***REMOVED***
-- **`hd_reconciliation_analyzer.py`** - ***REMOVED***
-
-#### 年度版本 (Year-specific Versions)
-每个公司都有对应的年度版本：
-- `*_reconciliation_analyzer_2022.py`
-- `*_reconciliation_analyzer_2023.py`
-- `*_reconciliation_analyzer_2024.py`
+- **`general_reconciliation_analyzer.py`** — 通用CLI工具，支持按账簿/公司模式筛选并进行JE与TB对账。
 
 #### 功能特性 (Features)
-- ✅ **JE与TB对账**: 记账凭证(Journal Entry)与试算平衡表(Trial Balance)对账
-- ✅ **智能数据解析**: 自动处理货币格式、科目编码提取
-- ✅ **多格式支持**: 支持不同的Excel文件格式和列结构
-- ✅ **差异分析**: 识别借贷方差异、缺失记录、重复记录
-- ✅ **分类报告**: 生成详细的对账差异分类报告
-- ✅ **公司定制**: 针对不同公司账簿进行专门优化
+- ✅ **JE与TB对账**: 记账凭证与试算平衡表的明细对账与汇总对账
+- ✅ **智能数据解析**: 自动处理货币格式、科目编码提取与清洗
+- ✅ **多格式支持**: 适配不同的Excel列结构与重复列名
+- ✅ **差异分析**: 借贷差异、仅JE存在、仅TB存在等分类
+- ✅ **分类报告**: 输出包含汇总、差异明细、跳号检查、借贷平衡检查的Excel报告
+- ✅ **可配置筛选**: 通过 `--patterns` 或配置文件中的 `target_patterns` 选择目标账簿/公司
 
 ## 📋 系统要求 (System Requirements)
 
@@ -88,100 +73,48 @@ python accounting_voucher_analyzer_2025.py all
 #### 输出文件
 - `会计分录检查报告_YYYYMMDD_HHMMSS.xlsx`
 
-#### 批量文件分析器 (Batch Voucher Analyzer)
+#### 自动扫描 (Auto Discovery)
+`accounting_voucher_analyzer_2025.py` 会自动扫描当前目录下包含年份与 `je`/`JE` 关键词的Excel文件并进行分析；可通过参数指定年份或合并分析所有年份。
+
+### 对账分析器 (Reconciliation Analyzer)
+
+#### 通用CLI用法 (General CLI Usage)
 ```bash
-# 分析当前目录下所有JE文件（2022-2025年）
-python batch_voucher_analyzer.py
+# 使用配置文件运行
+python general_reconciliation_analyzer.py --config reconciliation_config.json
 
-# 只分析指定年份的文件
-python batch_voucher_analyzer.py --year 2023
+# 创建示例配置文件
+python general_reconciliation_analyzer.py --create-config
 
-# 指定扫描目录
-python batch_voucher_analyzer.py --dir "D:\\财务数据"
-
-# 使用自定义文件模式
-python batch_voucher_analyzer.py --pattern "*je*.xlsx"
+# 直接指定文件与筛选模式
+python general_reconciliation_analyzer.py \
+  --je-files 2025je1-6.xlsx 2025je7-12.xlsx \
+  --tb-file tb2025.xlsx \
+  --patterns "BOOK_PATTERN" "COMPANY_PATTERN" \
+  --output-prefix "对账报告"
 ```
 
-### 对账分析器 (Reconciliation Analyzers)
+**输入文件:**
+- `JE` 明细文件，如: `2025je.xlsx`, `je_2025_part1.xlsx`
+- `TB` 试算平衡文件，如: `tb2025.xlsx`
 
-#### ***REMOVED*** (JX)
+**输出文件:**
+- `对账报告_<pattern或全部账套>_YYYYMMDD_HHMMSS.xlsx`
+
+### 通用对账脚本 CLI (General Reconciliation CLI)
 ```bash
-# 运行对账分析
-python jx_reconciliation_analyzer.py
-
 # 查看帮助
-python jx_reconciliation_analyzer.py help
-```
+python general_reconciliation_analyzer.py --help
 
-**输入文件:**
-- `2025je.xlsx` - 记账凭证数据
-- `jxtb2025.xlsx` - 试算平衡表数据
+# 使用多模式筛选账簿/公司
+python general_reconciliation_analyzer.py \
+  --je-files je_2025.xlsx \
+  --tb-file tb_2025.xlsx \
+  --patterns "PATTERN_A" "PATTERN_B" \
+  --threshold 0.01
 
-**输出文件:**
-- `***REMOVED***对账报告_YYYYMMDD_HHMMSS.xlsx`
-
-#### ***REMOVED*** (DG)
-```bash
-python dg_reconciliation_analyzer.py
-```
-
-**输入文件:**
-- `2025je.xlsx` - 记账凭证数据
-- `tb2025.xlsx` - 试算平衡表数据
-
-**输出文件:**
-- `***REMOVED***对账报告_YYYYMMDD_HHMMSS.xlsx`
-
-#### ***REMOVED*** (HD)
-```bash
-python hd_reconciliation_analyzer.py
-```
-
-**输入文件:**
-- `2025je.xlsx` - 记账凭证数据
-- `hdtb2025.xlsx` - 试算平衡表数据
-
-**输出文件:**
-- `***REMOVED***对账报告_YYYYMMDD_HHMMSS.xlsx`
-
-### 通用对账脚本 CLI (General Reconciliation Script)
-```bash
-python general_reconciliation_script.py \
-    --je-file je_data.xlsx \
-    --tb-file tb_data.xlsx \
-    --target-pattern "COMPANY_PATTERN"
-```
-
-可选参数:
-- `--config` 配置文件路径 (JSON)
-- `--output-prefix` 输出文件前缀
-- `--threshold` 对账阈值
-- `--output-dir` 报告输出目录
-- 多次使用 `--target-pattern` 以筛选多家公司
-
-示例:
-```bash
-# 单一公司
-python general_reconciliation_script.py \
-    --je-file je_2025.xlsx \
-    --tb-file tb_2025.xlsx \
-    --target-pattern "***REMOVED***" \
-    --output-prefix "***REMOVED***_对账报告"
-
-# 多家公司
-python general_reconciliation_script.py \
-    --je-file je_2025.xlsx \
-    --tb-file tb_2025.xlsx \
-    --target-pattern "***REMOVED***" \
-    --target-pattern "***REMOVED***"
-
-# 使用配置文件
-python general_reconciliation_script.py \
-    --je-file je_2025.xlsx \
-    --tb-file tb_2025.xlsx \
-    --config company_config.json \
-    --threshold 0.01
+# 使用配置文件运行（推荐）
+python general_reconciliation_analyzer.py --config reconciliation_config.json
 ```
 
 ## 📊 报告内容 (Report Contents)
@@ -232,28 +165,15 @@ python general_reconciliation_script.py \
 
 ```
 testing/
-├── README.md                              # 项目说明文档（整合版）
-├── requirements.txt                        # Python依赖包
-│
-├── 会计分录检查器 (Accounting Voucher Analyzers)
-│   ├── accounting_voucher_analyzer_2025.py    # 最新版本 (推荐)
-│   ├── accounting_voucher_analyzer.py         # 原版本
-│   ├── accounting_voucher_analyzer_2022.py    # 2022年版本
-│   ├── accounting_voucher_analyzer_2023.py    # 2023年版本
-│   └── accounting_voucher_analyzer_2024.py    # 2024年版本
-│
-├── 对账分析器 (Reconciliation Analyzers)
-│   ├── general_reconciliation_script.py       # 通用CLI脚本
-│   ├── jx_reconciliation_analyzer.py          # ***REMOVED*** (最新)
-│   ├── dg_reconciliation_analyzer.py          # ***REMOVED*** (最新)
-│   ├── hd_reconciliation_analyzer.py          # ***REMOVED*** (最新)
-│   ├── *_reconciliation_analyzer_2022.py      # 按年度版本
-│   ├── *_reconciliation_analyzer_2023.py      # 按年度版本
-│   └── *_reconciliation_analyzer_2024.py      # 按年度版本
-│
-└── 其他文件 (Other Files)
-    ├── .gitignore                             # Git忽略文件
-    └── 20250801-pz/                          # 数据目录
+├── README.md                          # 项目说明文档
+├── requirements.txt                   # Python依赖包
+├── accounting_voucher_analyzer_2025.py# 会计分录检查器（支持2022–2025）
+├── general_reconciliation_analyzer.py # 通用对账分析器CLI
+├── utils.py                           # 通用工具函数
+├── example_company_config.json        # 示例公司/账簿配置
+├── tb_format_config_examples.json     # TB格式配置示例
+├── example_usage.py                   # 使用示例脚本
+└── .gitignore                         # Git忽略文件
 ```
 
 ## 🔧 技术特性 (Technical Features)
@@ -304,7 +224,7 @@ testing/
 
 ## 📄 许可证 (License)
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+本项目采用 MIT 许可证。
 
 ## 📞 支持与联系 (Support & Contact)
 
