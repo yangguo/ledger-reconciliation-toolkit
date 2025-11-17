@@ -364,23 +364,20 @@ class GeneralReconciliationAnalyzer:
             credit_col = '贷方本币'
         
         # 处理账簿筛选
-        if book_col and book_col in tb_clean.columns and target_patterns:
+        if book_col and book_col in tb_clean.columns:
             tb_clean[book_col] = tb_clean[book_col].astype(str).str.strip()
-            print(f"筛选前TB记录数: {len(tb_clean)}")
-            
-            pattern_filter = pd.Series([False] * len(tb_clean))
-            for pattern in target_patterns:
-                pattern_filter |= tb_clean[book_col].str.contains(pattern, na=False)
-            tb_clean = tb_clean[pattern_filter]
-            print(f"筛选账套后TB记录数: {len(tb_clean)}")
-            
-            # 显示找到的账套
-            if len(tb_clean) > 0:
-                found_books = tb_clean[book_col].unique()
-                print(f"TB中找到的账套数量: {len(found_books)}")
-                for i, book in enumerate(found_books):
-                    print(f"  {i+1}. {book}")
-            # 标记TB数据有真实的账簿列
+            if target_patterns:
+                print(f"筛选前TB记录数: {len(tb_clean)}")
+                pattern_filter = pd.Series([False] * len(tb_clean))
+                for pattern in target_patterns:
+                    pattern_filter |= tb_clean[book_col].str.contains(pattern, na=False)
+                tb_clean = tb_clean[pattern_filter]
+                print(f"筛选账套后TB记录数: {len(tb_clean)}")
+                if len(tb_clean) > 0:
+                    found_books = tb_clean[book_col].unique()
+                    print(f"TB中找到的账套数量: {len(found_books)}")
+                    for i, book in enumerate(found_books):
+                        print(f"  {i+1}. {book}")
             self._tb_has_real_book_column = True
         elif not book_col:
             print("未找到账簿列，将添加目标账簿")
